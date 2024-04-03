@@ -15,7 +15,23 @@ const app = require("./app");
 
 const port = process.env.PORT || 8000;
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
   // eslint-disable-next-line no-console
   console.log(`Server live at http://127.0.0.1:${port}`);
+});
+
+process.on("unhandledRejection", (err) => {
+  console.log(err.name, err.message);
+  console.log("Unhandled Rejection! Shutting down...");
+  server.close(() => {
+    process.exit(1);
+  });
+});
+
+process.on("uncaughtException", (err) => {
+  console.log(err.name, err.message);
+  console.log("Uncaught Exception! Shutting down...");
+  server.close(() => {
+    process.exit(1);
+  });
 });

@@ -1,5 +1,7 @@
+/* eslint-disable prettier/prettier */
 const express = require("express");
 const tourController = require("../controllers/tourController");
+const authController = require("../controllers/authController");
 
 const router = express.Router();
 
@@ -15,12 +17,24 @@ router.route("/tour-plan/:year").get(tourController.getMonthlyPlan);
 
 router
   .route("/")
-  .get(tourController.getAllTours)
-  .post(tourController.postNewTour);
+  .get(authController.protect, tourController.getAllTours)
+  .post(
+    authController.protect,
+    authController.restrictTo("lead-guide", "admin"),
+    tourController.postNewTour
+  );
 router
   .route("/:id")
-  .get(tourController.getSingleTourByID)
-  .patch(tourController.patchTourByID)
-  .delete(tourController.deleteTourByID);
+  .get(authController.protect, tourController.getSingleTourByID)
+  .patch(
+    authController.protect,
+    authController.restrictTo("admin", "lead-guide", "guide"),
+    tourController.patchTourByID
+  )
+  .delete(
+    authController.protect,
+    authController.restrictTo("admin", "lead-guide"),
+    tourController.deleteTourByID
+  );
 
 module.exports = router;
