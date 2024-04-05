@@ -2,6 +2,7 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
 
 const userSchema = new mongoose.Schema(
   {
@@ -83,7 +84,10 @@ const userSchema = new mongoose.Schema(
 
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
-  this.password = await bcrypt.hashSync(this.password, 16);
+  const salt = await bcrypt.genSalt(16);
+  this.password = await bcrypt.hash(this.password, salt);
+
+  this.previousPasswords.unshift(this.password);
   this.passwordConfirm = undefined;
   next();
 });
@@ -95,6 +99,18 @@ userSchema.methods.correctPassword = function (
   return bcrypt.compare(candidatePassword, userPassword);
 };
 
+userSchema.methods.previousUsedPassword = function (password) {
+  if (this.previousPasswords.length === 4) {
+    this.previousPasswords.pop();
+  }
+
+  const foundMatch = this.previousPasswords.some((element) =>
+    bcrypt.compareSync(password, element)
+  );
+  if (foundMatch) return this.passwordChangedAt;
+  return foundMatch;
+};
+
 userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
   if (this.passwordChangedAt) {
     const changedTimestamp = parseInt(
@@ -104,6 +120,23 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
     return JWTTimestamp < changedTimestamp;
   }
   return false;
+};
+
+userSchema.methods.usedPreviousPassword = function (
+  password,
+  previousPassword
+) {
+  return bcrypt.compareSync(password, previousPassword);
+};
+
+userSchema.methods.createPasswordResetToken = function () {
+  const resetToken = crypto.randomBytes(32).toString("hex");
+  this.passwordResetToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+  this.passwordResetExpires = Date.now() + 15 * 60 * 1000;
+  return resetToken;
 };
 
 const User = mongoose.model("User", userSchema);
