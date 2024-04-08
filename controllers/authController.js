@@ -9,6 +9,7 @@ const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const sendEmail = require("../utils/email");
 
+// ()=> Sing Up Function
 exports.signup = catchAsync(async (req, res, next) => {
   const newUser = await User.create({
     name: req.body.name,
@@ -19,6 +20,12 @@ exports.signup = catchAsync(async (req, res, next) => {
   const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
+  res.cookie("jwt", token, {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+    ),
+    httpOnly: process.env.NODE_ENV === "production",
+  });
   res.status(201).json({
     status: "sucess",
     token,
@@ -28,6 +35,7 @@ exports.signup = catchAsync(async (req, res, next) => {
   });
 });
 
+// ()=> Login Function
 exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
   if (!email || !password) {
@@ -40,12 +48,19 @@ exports.login = catchAsync(async (req, res, next) => {
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
+  res.cookie("jwt", token, {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+    ),
+    httpOnly: process.env.NODE_ENV === "production",
+  });
   res.status(200).json({
     status: "success",
     token,
   });
 });
 
+// ()=> Protect Function
 exports.protect = catchAsync(async (req, res, next) => {
   let token;
   if (
@@ -83,6 +98,7 @@ exports.protect = catchAsync(async (req, res, next) => {
   next();
 });
 
+// ()=> Restrict Middleware
 exports.restrictTo =
   (...roles) =>
   (req, res, next) => {
@@ -94,6 +110,7 @@ exports.restrictTo =
     next();
   };
 
+// ()=> Forget Password Function
 exports.forgetPassword = catchAsync(async (req, res, next) => {
   if (!req.body.email) {
     return next(new AppError("Please provide an email!", 400));
@@ -134,6 +151,7 @@ exports.forgetPassword = catchAsync(async (req, res, next) => {
   }
 });
 
+// ()=> Reset Password Function
 exports.resetPassword = catchAsync(async (req, res, next) => {
   if (!req.body.password || !req.body.passwordConfirm) {
     return next(
@@ -199,5 +217,67 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: "success",
     token,
+  });
+});
+
+// ()=> Update Password Function
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.user.id).select("+password");
+  if (!user) {
+    return next(new AppError("User does not exist!", 404));
+  }
+  if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
+    return next(new AppError("Your current password is wrong!", 401));
+  }
+  if (req.body.password === req.body.passwordCurrent) {
+    return next(
+      new AppError("New password cannot be same as current password!", 400)
+    );
+  }
+  const previousPassword = await user.previousUsedPassword(req.body.password);
+  if (previousPassword) {
+    return next(
+      new AppError(
+        "You cannot use this password as new password because you have used it previously!",
+        400
+      )
+    );
+  }
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  user.passwordChangedAt = Date.now();
+  await user.save();
+  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN,
+  });
+  res.status(200).json({
+    status: "success",
+    token,
+  });
+});
+
+exports.updateMe = catchAsync(async (req, res, next) => {
+  if (req.body.password || req.body.passwordConfirm) {
+    return next(
+      new AppError(
+        "This route is not for password updates. Please use /updateMyPassword",
+        400
+      )
+    );
+  }
+  const filteredBody = {
+    name: req.body.name,
+    photo: req.body.photo,
+    email: req.body.email,
+  };
+  const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
+    new: true,
+    runValidators: true,
+  });
+  res.status(200).json({
+    status: "success",
+    data: {
+      user: updatedUser,
+    },
   });
 });
