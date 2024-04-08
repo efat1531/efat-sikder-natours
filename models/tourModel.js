@@ -1,6 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 const mongoose = require("mongoose");
 const slugify = require("slugify");
+const User = require("./userModel");
 
 const toursSchema = new mongoose.Schema(
   {
@@ -71,10 +72,45 @@ const toursSchema = new mongoose.Schema(
       trim: true,
       required: [true, "Tour must have a image cover!"],
     },
+    startLocation: {
+      type: {
+        type: String,
+        default: "Point",
+        enum: ["Point"],
+        required: [true, "A tour must have a start location!"],
+      },
+      coordinates: [Number],
+      address: String,
+      description: String,
+    },
+    locations: [
+      {
+        type: {
+          type: String,
+          default: "Point",
+          enum: ["Point"],
+        },
+        coordinates: [Number],
+        address: String,
+        description: String,
+        day: Number,
+      },
+    ],
+    guides: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: "User",
+      },
+    ],
+    leadGuide: {
+      type: mongoose.Schema.ObjectId,
+      ref: "User",
+    },
     images: [String],
     startDates: [Date],
   },
   {
+    timestamps: true,
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
   }
@@ -82,6 +118,18 @@ const toursSchema = new mongoose.Schema(
 
 toursSchema.virtual("durationWeeks").get(function () {
   return this.duration / 7;
+});
+
+toursSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: "guides",
+    select: "-__v -passwordChangedAt -_id",
+  });
+  this.populate({
+    path: "leadGuide",
+    select: "-__v -passwordChangedAt -_id",
+  });
+  next();
 });
 
 toursSchema.pre("save", function (next) {
