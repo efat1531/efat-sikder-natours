@@ -7,6 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon server.js",
     "prod": "NODE_ENV=production nodemon server.js",
+    "debug": "ndb server.js",
     "delete-data": "node dev-data/data/importDevData.js --delete",
     "import-data": "node dev-data/data/importDevData.js --import"
   },
@@ -21,7 +22,7 @@
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
     "moment": "^2.30.1",
-    "mongoose": "^8.2.1",
+    "mongoose": "^8.3.1",
     "mongoose-express-sanitizer": "^2.0.1",
     "morgan": "^1.10.0",
     "nodemailer": "^6.9.13",
