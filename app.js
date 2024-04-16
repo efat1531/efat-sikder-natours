@@ -10,12 +10,13 @@ const tourRouter = require("./routes/tourRoutes");
 const userRouter = require("./routes/userRoutes");
 const AppError = require("./utils/appError");
 const globalErrorHandler = require("./controllers/errorController");
+const reviewRouter = require("./routes/reviewRoutes");
 
 const generalRateLimiter = ratelimit({
   max: 100,
   windowMs: 60 * 60 * 1000,
   message: "Too many requests from this IP, please try again in an hour!",
-  legacyheaders: true,
+  legacyheaders: false,
   skipSuccessfulRequests: true,
 });
 
@@ -23,7 +24,7 @@ const authRateLimiter = ratelimit({
   max: 10,
   windowMs: 15 * 60 * 1000,
   message: "Too many requests from this IP, please try again in an hour!",
-  legacyheaders: true,
+  legacyheaders: false,
   skipSuccessfulRequests: true,
 });
 
@@ -41,6 +42,7 @@ if (process.env.NODE_ENV === "development") {
 
 app.use("/api/v1/tours", generalRateLimiter, tourRouter);
 app.use("/api/v1/users", authRateLimiter, userRouter);
+app.use("/api/v1/reviews", generalRateLimiter, reviewRouter);
 
 app.all("*", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
