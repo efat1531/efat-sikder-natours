@@ -73,7 +73,6 @@ const userSchema = new mongoose.Schema(
   {
     toJSON: {
       transform: function (doc, ret) {
-        delete ret.role;
         delete ret.__v;
         delete ret.previousPasswords;
         delete ret.active;

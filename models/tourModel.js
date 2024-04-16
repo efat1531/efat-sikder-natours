@@ -38,6 +38,7 @@ const toursSchema = new mongoose.Schema(
       default: 0.0,
       min: 0.0,
       max: 5.0,
+      set: (val) => Math.round(val * 10) / 10,
     },
     ratingsQuantity: {
       type: Number,
@@ -120,11 +121,25 @@ toursSchema.virtual("durationWeeks").get(function () {
   return this.duration / 7;
 });
 
+toursSchema.index({ price: 1, ratingsAverage: -1 });
+toursSchema.index({ slug: 1 });
+toursSchema.index({ startLocation: "2dsphere" });
+
+toursSchema.virtual("reviews", {
+  ref: "Review",
+  foreignField: "tour",
+  localField: "_id",
+});
+
 toursSchema.pre(/^find/, function (next) {
   this.populate({
     path: "guides",
     select: "-__v -passwordChangedAt -_id",
   });
+  next();
+});
+
+toursSchema.pre(/^find/, function (next) {
   this.populate({
     path: "leadGuide",
     select: "-__v -passwordChangedAt -_id",
