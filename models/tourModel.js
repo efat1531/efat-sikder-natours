@@ -1,7 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 const mongoose = require("mongoose");
 const slugify = require("slugify");
-const User = require("./userModel");
 
 const toursSchema = new mongoose.Schema(
   {
@@ -42,7 +41,7 @@ const toursSchema = new mongoose.Schema(
     },
     ratingsQuantity: {
       type: Number,
-      default: 0,
+      default: 4.5,
     },
     price: {
       type: Number,
