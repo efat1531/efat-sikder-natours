@@ -60,6 +60,38 @@ exports.login = catchAsync(async (req, res, next) => {
   });
 });
 
+// ()=> Logout Function
+exports.logout = (req, res) => {
+  res.cookie("jwt", "loggedout", {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: process.env.NODE_ENV === "production",
+  });
+  res.status(200).json({ status: "success" });
+};
+
+exports.isLoggedIn = async (req, res, next) => {
+  if (req.cookies.jwt) {
+    try {
+      const decodedData = await util.promisify(jwt.verify)(
+        req.cookies.jwt,
+        process.env.JWT_SECRET
+      );
+      const user = await User.findById(decodedData.id);
+      if (!user) {
+        return next();
+      }
+      if (user.changedPasswordAfter(decodedData.iat)) {
+        return next();
+      }
+      res.locals.user = user;
+      return next();
+    } catch (error) {
+      return next();
+    }
+  }
+  next();
+};
+
 // ()=> Protect Function
 exports.protect = catchAsync(async (req, res, next) => {
   let token;
@@ -68,6 +100,8 @@ exports.protect = catchAsync(async (req, res, next) => {
     req.headers.authorization.startsWith("Bearer")
   ) {
     token = req.headers.authorization.split(" ")[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
   }
   if (!token) {
     return next(
