@@ -18,7 +18,9 @@ const port = process.env.PORT || 4000;
 
 const server = app.listen(port, () => {
   // eslint-disable-next-line no-console
-  console.log(`Server live at http://127.0.0.1:${port}`);
+  console.log(
+    `Server live at http://localhost:${port} in ${process.env.NODE_ENV} mode`
+  );
 });
 
 process.on("unhandledRejection", (err) => {
