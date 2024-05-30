@@ -1,0 +1,56 @@
+{
+  "name": "natours",
+  "version": "1.0.0",
+  "description": "Learning Development",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon server.js",
+    "prod": "NODE_ENV=production nodemon server.js",
+    "debug": "ndb server.js",
+    "delete-data": "node dev-data/data/importDevData.js --delete",
+    "import-data": "node dev-data/data/importDevData.js --import"
+  },
+  "author": "Efat Sikder",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.3",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^7.2.0",
+    "helmet": "^7.1.0",
+    "html-to-text": "^9.0.5",
+    "jsonwebtoken": "^9.0.2",
+    "moment": "^2.30.1",
+    "mongoose": "^8.3.1",
+    "mongoose-express-sanitizer": "^2.0.1",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.13",
+    "parcel-bundler": "^1.12.5",
+    "pug": "^3.0.2",
+    "sharp": "^0.33.4",
+    "slugify": "^1.6.6",
+    "stripe": "^15.8.0",
+    "validator": "^13.11.0",
+    "xss-clean": "^0.1.4"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-jsx-a11y": "^6.8.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "eslint-plugin-react": "^7.34.0",
+    "ndb": "^0.2.4",
+    "nodemon": "^3.1.0",
+    "prettier": "^3.2.5"
+  },
+  "engines": {
+    "node": ">=10.6.0"
+  }
+}
