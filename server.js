@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable import/no-extraneous-dependencies */
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");

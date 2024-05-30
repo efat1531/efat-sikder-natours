@@ -8,7 +8,7 @@ const xss = require("xss-clean");
 const path = require("path");
 const cookieParser = require("cookie-parser");
 const nodemailer = require("nodemailer");
-const { env } = require("process");
+const compression = require("compression");
 
 const tourRouter = require("./routes/tourRoutes");
 const userRouter = require("./routes/userRoutes");
@@ -17,27 +17,6 @@ const globalErrorHandler = require("./controllers/errorController");
 const reviewRouter = require("./routes/reviewRoutes");
 const viewRouter = require("./routes/viewRoutes");
 const bookingRouter = require("./routes/bookingRoutes");
-
-const scriptSrcUrls = [
-  "https://api.tiles.mapbox.com/",
-  "https://api.mapbox.com/",
-  "https://unpkg.com/axios/dist/axios.min.js",
-];
-const styleSrcUrls = [
-  "https://api.mapbox.com/",
-  "https://api.tiles.mapbox.com/",
-  "https://fonts.googleapis.com/",
-  "https://unpkg.com/axios/dist/axios.min.js",
-];
-const connectSrcUrls = [
-  "https://api.mapbox.com/",
-  "https://a.tiles.mapbox.com/",
-  "https://b.tiles.mapbox.com/",
-  "https://events.mapbox.com/",
-  "https://unpkg.com/axios/dist/axios.min.js",
-];
-
-const fontSrcUrls = ["fonts.googleapis.com", "fonts.gstatic.com"];
 
 const generalRateLimiter = ratelimit({
   max: 100,
@@ -76,6 +55,8 @@ app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
   next();
 });
+
+app.use(compression());
 
 app.use("/", viewRouter);
 app.use("/api/v1/tours", generalRateLimiter, tourRouter);
