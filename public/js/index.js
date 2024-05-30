@@ -19,7 +19,7 @@ const login = async (email, password) => {
     document.body.style.cursor = "wait";
     const res = await axios({
       method: "POST",
-      url: `http://${window.location.host}/api/v1/users/login`,
+      url: `${window.location.protocol}://${window.location.host}/api/v1/users/login`,
       data: {
         email,
         password,
@@ -96,7 +96,7 @@ const updateUserData = async (formData) => {
     }
     const userData = await axios({
       method: "GET",
-      url: `http://${window.location.host}/api/v1/users/myData`,
+      url: `${window.location.protocol}://${window.location.host}/api/v1/users/myData`,
     });
     const res = await axios({
       method: "PATCH",
