@@ -1,4 +1,5 @@
 const express = require("express");
+// eslint-disable-next-line import/no-extraneous-dependencies
 
 const authController = require("../controllers/authController");
 const userController = require("../controllers/userController");
@@ -15,11 +16,14 @@ router
   .route("/allUsers")
   .get(authController.restrictTo("admin"), userController.getAllUsers);
 router.route("/updateMyPassword").patch(authController.updatePassword);
+router.route("/logout").get(authController.logout);
 
-router
-  .route("/myData")
-  .get(userController.currentUser)
-  .patch(userController.updateMe);
+router.route("/myData").get(userController.currentUser).patch(
+  userController.uploadUserPhoto,
+  userController.resizeUserPhoto,
+  // eslint-disable-next-line prettier/prettier
+  userController.updateMe
+);
 
 router.route("/deleteMe").delete(userController.deleteMe);
 
