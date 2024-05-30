@@ -1,26 +1,43 @@
 const AppError = require("../utils/appError");
 
-const sendErrorDev = (err, res) => {
-  res.status(err.statusCode).json({
-    status: err.status,
-    error: err,
-    message: err.message,
-    stack: err.stack,
+const sendErrorDev = (err, req, res) => {
+  if (req.originalUrl.startsWith("/api")) {
+    return res.status(err.statusCode).json({
+      status: err.status,
+      error: err,
+      message: err.message,
+      stack: err.stack,
+    });
+  }
+  res.status(err.statusCode).render("error", {
+    title: "Something went wrong!",
+    msg: err.message,
   });
 };
 
-const sendErrorClient = (err, res) => {
-  if (err.isOperational) {
-    res.status(err.statusCode).json({
-      status: err.status,
-      message: err.message,
-    });
-  } else {
-    res.status(500).json({
+const sendErrorClient = (err, req, res) => {
+  if (req.originalUrl.startsWith("/api")) {
+    if (err.isOperational) {
+      return res.status(err.statusCode).json({
+        status: err.status,
+        message: err.message,
+      });
+    }
+    return res.status(500).json({
       status: "Failed",
       message: "An unknown error occured. Please wait and refresh!",
     });
   }
+  if (err.isOperational) {
+    return res.status(err.statusCode).render("error", {
+      title: "Something went wrong!",
+      msg: err.message,
+    });
+  }
+  res.status(500).render("error", {
+    title: "Something went wrong!",
+    msg: "Please try again later!",
+  });
 };
 
 const handleCastErrorDB = (err) => {
@@ -48,9 +65,10 @@ module.exports = (error, req, res, next) => {
   error.statusCode = error.statusCode || 500;
   error.status = error.status || "error";
   if (process.env.NODE_ENV === "development") {
-    sendErrorDev(error, res);
+    sendErrorDev(error, req, res);
   } else {
     let err = { ...error };
+    err.message = error.message;
     if (error.name === "CastError") err = handleCastErrorDB(err);
     if (error.code === 11000) {
       err = handleDuplicateFieldsDB(err);
@@ -64,6 +82,6 @@ module.exports = (error, req, res, next) => {
     if (error.name === "TokenExpiredError") {
       err = new AppError("Your token has expired. Please login again!", 401);
     }
-    sendErrorClient(err, res);
+    sendErrorClient(err, req, res);
   }
 };
