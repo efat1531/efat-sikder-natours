@@ -7,6 +7,8 @@ const expressMongoSanitize = require("express-mongo-sanitize");
 const xss = require("xss-clean");
 const path = require("path");
 const cookieParser = require("cookie-parser");
+const nodemailer = require("nodemailer");
+const { env } = require("process");
 
 const tourRouter = require("./routes/tourRoutes");
 const userRouter = require("./routes/userRoutes");
@@ -14,6 +16,7 @@ const AppError = require("./utils/appError");
 const globalErrorHandler = require("./controllers/errorController");
 const reviewRouter = require("./routes/reviewRoutes");
 const viewRouter = require("./routes/viewRoutes");
+const bookingRouter = require("./routes/bookingRoutes");
 
 const scriptSrcUrls = [
   "https://api.tiles.mapbox.com/",
@@ -54,26 +57,11 @@ const authRateLimiter = ratelimit({
 
 const app = express();
 app.use(cookieParser());
+app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 app.use(express.static(path.join(__dirname, "public")));
 
 app.set("view engine", "pug");
 app.set("views", `${__dirname}/views`);
-
-app.use(
-  helmet.contentSecurityPolicy({
-    directives: {
-      defaultSrc: [],
-      connectSrc: ["'self'", ...connectSrcUrls],
-      scriptSrc: ["'self'", ...scriptSrcUrls],
-      styleSrc: ["'self'", "'unsafe-inline'", ...styleSrcUrls],
-      workerSrc: ["'self'", "blob:"],
-      objectSrc: [],
-      imgSrc: ["'self'", "blob:", "data:"],
-      fontSrc: ["'self'", ...fontSrcUrls],
-    },
-    // eslint-disable-next-line prettier/prettier
-  })
-);
 
 app.use(express.json({ limit: "10kb" }));
 app.use(express.static(`${__dirname}/public`));
@@ -93,6 +81,7 @@ app.use("/", viewRouter);
 app.use("/api/v1/tours", generalRateLimiter, tourRouter);
 app.use("/api/v1/users", authRateLimiter, userRouter);
 app.use("/api/v1/reviews", generalRateLimiter, reviewRouter);
+app.use("/api/v1/bookings", generalRateLimiter, bookingRouter);
 
 app.all("*", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));

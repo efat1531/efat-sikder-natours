@@ -68,6 +68,7 @@ module.exports.updateReview = catchAsync(async (req, res, next) => {
     {
       new: true,
       runValidators: true,
+      // eslint-disable-next-line prettier/prettier
     }
   );
   res.status(200).json({
