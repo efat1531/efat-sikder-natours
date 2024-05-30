@@ -51,13 +51,7 @@ module.exports = class Email {
     };
 
     // 3) Create a transport and send email
-    this.newTransport().sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.log("Error occurred while sending email: ", error);
-      } else {
-        console.log("Email sent: ", info.response);
-      }
-    });
+    this.newTransport().sendMail(mailOptions);
   }
 
   async sendWelcome() {
