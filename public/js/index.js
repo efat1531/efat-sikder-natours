@@ -54,7 +54,7 @@ const logout = async () => {
     document.body.style.cursor = "wait";
     const res = await axios({
       method: "GET",
-      url: `http://${window.location.host}/api/v1/users/logout`,
+      url: `${window.location.protocol}://${window.location.host}/api/v1/users/logout`,
     });
     if (res.data.status === "success") {
       showAlert("success", "Logged out successfully!");
@@ -100,7 +100,7 @@ const updateUserData = async (formData) => {
     });
     const res = await axios({
       method: "PATCH",
-      url: `http://${window.location.host}/api/v1/users/myData`,
+      url: `${window.location.protocol}://${window.location.host}/api/v1/users/myData`,
       data,
       headers: {
         "Content-Type": "multipart/form-data",
@@ -117,7 +117,7 @@ const updateUserData = async (formData) => {
         showAlert("success", "Please login with new email!");
         const res1 = await axios({
           method: "GET",
-          url: `http://${window.location.host}/api/v1/users/logout`,
+          url: `${window.location.protocol}://${window.location.host}/api/v1/users/logout`,
         });
         if (res1.data.status === "success") {
           window.setTimeout(() => {
@@ -142,7 +142,7 @@ const updateUserData = async (formData) => {
 };
 
 const updatePassword = async (currentPassword, password, passwordConfirm) => {
-  const url = `http://${window.location.host}/api/v1/users/updateMyPassword`;
+  const url = `${window.location.protocol}://${window.location.host}/api/v1/users/updateMyPassword`;
   try {
     document.body.style.cursor = "wait";
     const res = await axios({
@@ -245,7 +245,7 @@ const bookTour = async (tourId) => {
   try {
     const session = await axios({
       method: "GET",
-      url: `http://${window.location.host}/api/v1/bookings/checkout-session/${tourId}`,
+      url: `${window.location.protocol}://${window.location.host}/api/v1/bookings/checkout-session/${tourId}`,
     });
     await stripe.redirectToCheckout({
       sessionId: session.data.session.id,
@@ -277,7 +277,7 @@ if (document.querySelector(".form--signup")) {
         document.body.style.cursor = "wait";
         const res = await axios({
           method: "POST",
-          url: `http://${window.location.host}/api/v1/users/signup`,
+          url: `${window.location.protocol}://${window.location.host}/api/v1/users/signup`,
           data: {
             name: signUpName,
             email: signUpEmail,
@@ -311,7 +311,7 @@ if (document.querySelector(".form--passwordReset")) {
         document.body.style.cursor = "wait";
         const res = await axios({
           method: "POST",
-          url: `http://${window.location.host}/api/v1/users/forgetPassword`,
+          url: `${window.location.protocol}://${window.location.host}/api/v1/users/forgetPassword`,
           data: {
             email: resetEmail,
           },
@@ -350,7 +350,7 @@ if (document.querySelector(".form--resetPassword")) {
         document.body.style.cursor = "wait";
         const res = await axios({
           method: "PATCH",
-          url: `http://${window.location.host}/api/v1/users/resetPassword/${resetToken}`,
+          url: `${window.location.protocol}://${window.location.host}/api/v1/users/resetPassword/${resetToken}`,
           data: {
             password,
             passwordConfirm,
