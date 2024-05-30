@@ -7,6 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon server.js",
     "prod": "NODE_ENV=production nodemon server.js",
+    "production": "node server.js",
     "debug": "ndb server.js",
     "delete-data": "node dev-data/data/importDevData.js --delete",
     "import-data": "node dev-data/data/importDevData.js --import"
