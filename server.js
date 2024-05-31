@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 /* eslint-disable no-console */
 /* eslint-disable import/no-extraneous-dependencies */
 const dotenv = require("dotenv");
