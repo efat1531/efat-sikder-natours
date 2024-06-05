@@ -172,6 +172,26 @@ $ npm i eslint prettier eslint-config-prettier eslint-plugin-prettier eslint-con
 eslint-plugin-import eslint-plugin-jsx-a11y  eslint-plugin-react --save-dev
 ```
 
+## Login Credintials
+
+```
+Admin Credintials:
+Email: xehiqa@mailinator.com
+Password: Pa$$w0rd!
+
+User Credintials:
+Email: gicov@mailinator.com
+Password: Pa$$w0rd!
+
+Second User Credintials:
+Email: sahu@mailinator.com
+Password: Pa$$w0rd!
+```
+
+### Note 📝
+
+You can create your own account. As this server is hosted on readonly files, your photo will be temporary. But your account will be permanent.
+
 ## Contributing 💡
 
 Pull requests are welcome but please open an issue and discuss what you will do before 😊
@@ -200,3 +220,7 @@ Live demo (Feel free to visit) 👉🏻 : https://tourist-website.onrender.com/
 ## Acknowledgement 🙏🏻
 
 - This project is part of the online course I've taken at Udemy. Thanks to Jonas Schmedtmann for creating this awesome course! Link to the course: [Node.js, Express, MongoDB & More: The Complete Bootcamp 2024](https://www.udemy.com/course/nodejs-express-mongodb-bootcamp/)
+
+```
+
+```

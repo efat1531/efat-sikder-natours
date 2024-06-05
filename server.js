@@ -6,8 +6,10 @@ const mongoose = require("mongoose");
 
 dotenv.config({ path: "./.env" });
 
-const db = process.env.DATABASE;
-
+const db =
+  process.env.NODE_ENV === "production"
+    ? process.env.DATABASE_ONLINE
+    : process.env.DATABASE_ONLINE;
 mongoose
   .connect(db)
   .then(() => console.log("MongoDB has been connected sucessfully!"))
